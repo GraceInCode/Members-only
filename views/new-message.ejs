@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Message - Members Only Club</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>Members Only Club</h1>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/logout">Logout</a>
+                <% if (!user.is_member) { %>
+                    <a href="/join-club">Join the Club</a>
+                <% } %>
+            <% } else { %>
+                <a href="/login">Login</a>
+                <a href="/sign-up">Sign Up</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <div class="form">
+            <h1>New Message</h1>
+            
+            <!-- Error Messages Display -->
+            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                <ul class="error-list">
+                    <% errors.forEach(error => { %>
+                        <li><%= error.msg %></li>
+                    <% }) %>
+                </ul>
+            <% } %>
+            
+            <form action="/new-message" method="POST">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" class="input-field" 
+                           value="<%= typeof title !== 'undefined' ? title : '' %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="text">Message:</label>
+                    <textarea id="text" name="text" placeholder="Write your message here..." required><%= typeof text !== 'undefined' ? text : '' %></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Post Message</button>
+            </form>
+            
+            <p><a href="/">← Back to Messages</a></p>
+        </div>
+    </div>
+</body>
+</html>

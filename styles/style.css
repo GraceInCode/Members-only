@@ -1,0 +1,191 @@
+/* Define color variables for easy maintenance */
+:root {
+    --primary-color: #3498db;    /* Blue for navbar */
+    --secondary-color: #2ecc71;  /* Green for submit buttons */
+    --danger-color: #e74c3c;     /* Red for delete buttons and errors */
+    --text-color: #333;          /* Dark gray for text */
+    --bg-color: #f4f4f4;        /* Light gray background */
+}
+
+/* Global styles for consistency */
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Center content with a max width */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Navigation bar styling */
+.navbar {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar h1 {
+    margin: 0;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+/* Form styling for consistency across pages */
+.form {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.input-field:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 100px;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* Message card styling */
+.message-card {
+    background-color: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.message-card h3 {
+    margin-top: 0;
+}
+
+.message-card p {
+    margin-bottom: 0.5rem;
+}
+
+.meta {
+    font-size: 0.875rem;
+    color: #777;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: var(--danger-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    opacity: 0.9;
+}
+
+/* Error message styling */
+.error {
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+ul.error-list {
+    list-style: none;
+    padding: 0;
+    color: var(--danger-color);
+}
+
+ul.error-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* Consistent heading and paragraph styles */
+h1, h2, h3 {
+    color: var(--text-color);
+}
+
+p {
+    line-height: 1.6;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .nav-links a {
+        margin: 0.5rem 0;
+    }
+
+    .form {
+        padding: 1rem;
+    }
+}

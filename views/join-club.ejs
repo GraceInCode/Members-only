@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join the Exclusive Club - Members Only</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>Members Only Club</h1>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/login">Login</a>
+            <a href="/sign-up">Sign Up</a>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <div class="form">
+            <h1>Join the Exclusive Club</h1>
+            
+            <!-- Error Message Display -->
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            
+            <form action="/join-club" method="POST">
+                <div class="form-group">
+                    <label for="passcode">Passcode:</label>
+                    <input type="text" id="passcode" name="passcode" class="input-field" required>
+                </div>
+                
+                <button type="submit" class="btn">Join Club</button>
+            </form>
+            
+            <p>Need an account first? <a href="/sign-up">Sign up here</a></p>
+        </div>
+    </div>
+</body>
+</html>

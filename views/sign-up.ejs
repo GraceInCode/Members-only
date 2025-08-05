@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Members Only Club</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>Members Only Club</h1>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/login">Login</a>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <div class="form">
+            <h1>Sign Up</h1>
+            
+            <!-- Error Messages Display -->
+            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                <ul class="error-list">
+                    <% errors.forEach(error => { %>
+                        <li><%= error.msg %></li>
+                    <% }) %>
+                </ul>
+            <% } %>
+            
+            <form action="/sign-up" method="POST">
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" class="input-field" 
+                           value="<%= typeof firstName !== 'undefined' ? firstName : '' %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" class="input-field" 
+                           value="<%= typeof lastName !== 'undefined' ? lastName : '' %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" class="input-field" 
+                           value="<%= typeof email !== 'undefined' ? email : '' %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" class="input-field" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="input-field" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="isAdmin" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="isAdmin" name="isAdmin" 
+                               <%= typeof isAdmin !== 'undefined' && isAdmin ? 'checked' : '' %>>
+                        Admin privileges
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn">Sign Up</button>
+            </form>
+            
+            <p>Already have an account? <a href="/login">Login here</a></p>
+        </div>
+    </div>
+</body>
+</html>

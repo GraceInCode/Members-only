@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Only Club</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>Members Only Club</h1>
+        <div class="nav-links">
+            <% if (user) { %>
+                <a href="/new-message">Create New Message</a>
+                <a href="/logout">Logout</a>
+                <% if (!user.is_member) { %>
+                    <a href="/join-club">Join the Club</a>
+                <% } %>
+            <% } else { %>
+                <a href="/login">Login</a>
+                <a href="/sign-up">Sign Up</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <h2>Messages</h2>
+        
+        <!-- Display Messages -->
+        <% if (messages && messages.length > 0) { %>
+            <% messages.forEach(message => { %>
+                <div class="message-card">
+                    <!-- Delete button for admins -->
+                    <% if (user && user.is_admin) { %>
+                        <form action="/delete-message/<%= message.id %>" method="POST" style="display: inline;">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    <% } %>
+                    
+                    <h3><%= message.title %></h3>
+                    <p><%= message.text %></p>
+                    
+                    <!-- Show author and timestamp only to members -->
+                    <% if (user && user.is_member) { %>
+                        <div class="meta">
+                            By <%= message.first_name %> <%= message.last_name %> on <%= message.timestamp.toLocaleString() %>
+                        </div>
+                    <% } else { %>
+                        <div class="meta">
+                            Anonymous message
+                        </div>
+                    <% } %>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="message-card">
+                <p>No messages yet. Be the first to post!</p>
+            </div>
+        <% } %>
+        
+        <!-- Welcome message for non-members -->
+        <% if (!user || !user.is_member) { %>
+            <div class="form">
+                <h3>Welcome to the Members Only Club!</h3>
+                <p>Join our exclusive community to see who posted each message and when. Members get access to full message details and author information.</p>
+                <% if (!user) { %>
+                    <p><a href="/sign-up">Sign up</a> or <a href="/login">login</a> to get started.</p>
+                <% } else if (!user.is_member) { %>
+                    <p><a href="/join-club">Join the club</a> to unlock member privileges.</p>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>
