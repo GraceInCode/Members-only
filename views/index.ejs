@@ -73,5 +73,10 @@
             </div>
         <% } %>
     </div>
+    <% if (dbDown) { %>
+        <div class="alert alert-warning">
+            <p>Database is currently down. Some features may not be available.</p>
+        </div>
+    <% } %>
 </body>
 </html>
