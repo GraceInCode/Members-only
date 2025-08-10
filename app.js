@@ -48,12 +48,15 @@ passport.deserializeUser(async (id, done) => {
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
+app.set('trusted proxy', true); // for secure cookies in production
 app.use(session({ 
     secret: SESSION_SECRET,
     resave: false, 
     saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000 
     }
 }))
@@ -197,6 +200,13 @@ app.get('/_debug_env', (req, res) => {
   });
 });
 
+app.get('/me', (req, res) => {
+    res.json({
+        authenticated: req.isAuthenticated(),
+        user: req.user || null,
+        sessionID: req.sessionID || null,
+    })
+})
 
 // Logout route
 app.get('/logout', (req, res) => {
