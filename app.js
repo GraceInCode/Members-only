@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -7,6 +6,9 @@ const LocalStrategy = require('passport-local').Strategy;
 const { body, validationResult } = require('express-validator');
 const pool = require('./db')
 const app = express();
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
 const PORT = process.env.PORT || 8000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'your_secret_change_in_production'
@@ -151,10 +153,20 @@ app.post('/new-message', ensureAuthenticated, [
 
 // Home route
 app.get('/', async (req, res) => {
-    const result = await pool.query(
-        'SELECT messages.*, users.first_name, users.last_name FROM messages JOIN users ON messages.user_id = users.id ORDER BY timestamp DESC'
-    )
-    res.render('index', { messages: result.rows, user: req.user });
+    try {
+        const result = await pool.query(
+            'SELECT messages.*, users.first_name, users.last_name FROM messages JOIN users ON messages.user_id = users.id ORDER BY timestamp DESC'
+        );
+        res.render('index', { messages: result.rows, user: req.user });
+    } catch (err) {
+        console.error('DB query failed for / route', err.message);
+
+        return res.status(200).render('index', {
+            messages: [],
+            user: req.user,
+            dbDown: true
+        });
+    }
 });
 
 // Logout route
@@ -173,6 +185,6 @@ app.post('/delete-message/:id', ensureAdmin, async (req, res) => {
     res.redirect('/')
 })
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
 });
