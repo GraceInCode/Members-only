@@ -60,6 +60,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/styles', express.static('styles'));
+app.use((err, req, res, next) => {
+  console.error('Uncaught error:', err && err.stack ? err.stack : err);
+  res.status(500).send('Internal Server Error (logged)');
+});
     
 
 // Sign-up route
@@ -153,21 +157,46 @@ app.post('/new-message', ensureAuthenticated, [
 
 // Home route
 app.get('/', async (req, res) => {
-    try {
-        const result = await pool.query(
-            'SELECT messages.*, users.first_name, users.last_name FROM messages JOIN users ON messages.user_id = users.id ORDER BY timestamp DESC'
-        );
-        res.render('index', { messages: result.rows, user: req.user });
-    } catch (err) {
-        console.error('DB query failed for / route', err.message);
+  try {
+    const result = await pool.query(
+      `SELECT messages.*, users.first_name, users.last_name
+       FROM messages
+       JOIN users ON messages.user_id = users.id
+       ORDER BY timestamp DESC`
+    );
 
-        return res.status(200).render('index', {
-            messages: [],
-            user: req.user,
-            dbDown: true
-        });
-    }
+    const data = {
+      messages: result.rows || [],
+      user: req.user || null,
+      dbDown: false
+    };
+
+    // use callback to capture render errors
+    res.render('index', data, (err, html) => {
+      if (err) {
+        console.error('EJS render error for / :', err);
+        // temporary debugging response — remove or soften in production
+        return res.status(500).send(`Template render error: ${err.message}`);
+      }
+      res.send(html);
+    });
+
+  } catch (err) {
+    console.error('Handler error for / :', err);
+    // safe fallback: render empty page or send simple OK for now
+    return res.status(500).send('Server error (see logs).');
+  }
 });
+
+// Debug route
+app.get('/_debug_env', (req, res) => {
+  res.json({
+    NODE_ENV: process.env.NODE_ENV || null,
+    HAS_DATABASE_URL: Boolean(process.env.DATABASE_URL),
+    HAS_PORT: Boolean(process.env.PORT)
+  });
+});
+
 
 // Logout route
 app.get('/logout', (req, res) => {
