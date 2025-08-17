@@ -15,22 +15,28 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'your_secret_change_in_prod
 
 // Passport configuration
 passport.use(new LocalStrategy(
-    { usernameField: 'email' },
-    async (email, password, done) => {
-        try {
-            const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-            if (user.rows.length === 0) {
-                return done(null, false, { message: 'Incorrect email.' });
-            }
-            const match = await bcrypt.compare(password, user.rows[0].password);
-            if (!match) {
-                return done(null, false, { message: 'Incorrect password.' });
-            }
-            return done(null, user.rows[0]);
-        } catch (err) {
-            return done(err);
-        }
+  { usernameField: 'email' },
+  async (email, password, done) => {
+    try {
+      console.log('[auth] LocalStrategy called for email:', email);
+      const q = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+      if (q.rows.length === 0) {
+        console.log('[auth] no user found for', email);
+        return done(null, false, { message: 'Incorrect email.' });
+      }
+      const userRow = q.rows[0];
+      console.log('[auth] user found id=', userRow.id);
+      const match = await bcrypt.compare(password, userRow.password);
+      console.log('[auth] bcrypt.compare result for user', userRow.id, '=', match);
+      if (!match) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, userRow);
+    } catch (err) {
+      console.error('[auth] LocalStrategy error:', err);
+      return done(err);
     }
+  }
 ));
 
 passport.serializeUser((user, done) => {
@@ -132,10 +138,33 @@ app.get('/login', (req, res) => {
     res.render('login', { error: [] });
 })
 
-app.post('/login', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-}));
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      console.error('[login] authenticate error:', err);
+      return next(err);
+    }
+    if (!user) {
+      console.log('[login] authentication failed:', info);
+      // show the failure reason on the login page for testing (remove later)
+      return res.status(401).render('login', { error: info && info.message ? info.message : 'Login failed' });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        console.error('[login] req.logIn error:', err);
+        return next(err);
+      }
+      console.log('[login] login succeeded, sessionID=', req.sessionID, 'user.id=', user.id);
+
+      // ensure session is saved before redirect so Set-Cookie appears reliably
+      req.session.save((saveErr) => {
+        if (saveErr) console.error('[login] session.save error:', saveErr);
+        // Redirect to home (will include Set-Cookie on the response)
+        return res.redirect('/');
+      });
+    });
+  })(req, res, next);
+});
 
 // New mwssage route
 app.get('/new-message', ensureAuthenticated, (req, res) => {
