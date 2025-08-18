@@ -58,7 +58,7 @@ passport.deserializeUser(async (id, done) => {
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
-app.set('trusted proxy', 1); // for secure cookies in production
+app.set('trust proxy', 1); // for secure cookies in production
 app.use(session({ 
     secret: SESSION_SECRET,
     resave: false, 
