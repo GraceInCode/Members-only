@@ -40,17 +40,21 @@ passport.use(new LocalStrategy(
 ));
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+  console.log('serializeUser ->', user && user.id);
+  done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await pool.query('SELECT * FROM users WHERE id = $1', [id])
-        done(null, user.rows[0]);
-    } catch (err) {
-        done(err);
-    }
-})
+  console.log('deserializeUser ->', id);
+  try {
+    const user = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    done(null, user.rows[0]);
+  } catch (err) {
+    console.error('deserializeUser error', err);
+    done(err);
+  }
+});
+
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
@@ -140,26 +144,31 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      console.error('[login] authenticate error:', err);
-      return next(err);
-    }
+    if (err) return next(err);
     if (!user) {
-      console.log('[login] authentication failed:', info);
-      // show the failure reason on the login page for testing (remove later)
-      return res.status(401).render('login', { error: info && info.message ? info.message : 'Login failed' });
+      console.log('login failed:', info);
+      return res.redirect('/login');
     }
+
     req.logIn(user, (err) => {
       if (err) {
-        console.error('[login] req.logIn error:', err);
+        console.error('req.logIn error:', err);
         return next(err);
       }
-      console.log('[login] login succeeded, sessionID=', req.sessionID, 'user.id=', user.id);
 
-      // ensure session is saved before redirect so Set-Cookie appears reliably
-      req.session.save((saveErr) => {
-        if (saveErr) console.error('[login] session.save error:', saveErr);
-        // Redirect to home (will include Set-Cookie on the response)
+      // Log session state server-side (will show that session.passport.user is set)
+      console.log('login succeeded — session before save:', {
+        id: req.sessionID,
+        passport: req.session.passport
+      });
+
+      // Save session to store, then redirect — prevents race where redirect happens before session write
+      req.session.save((err) => {
+        if (err) {
+          console.error('session.save error:', err);
+          return next(err);
+        }
+        console.log('session saved, redirecting. sessionID:', req.sessionID);
         return res.redirect('/');
       });
     });
